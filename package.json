@@ -4,7 +4,7 @@
   "description": "Backend worker and server code for Rep0rter ",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "tsc && node src/index.js"
   },
   "keywords": [
     "rep0rter",
@@ -12,5 +12,17 @@
     "typescript"
   ],
   "author": "rep0rter<rep0rter@googlegroups.com>",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
 }
