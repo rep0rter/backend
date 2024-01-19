@@ -8,8 +8,7 @@
   },
   "keywords": [
     "rep0rter",
-    "g0v",
-    "typescript"
+    "g0v"
   ],
   "author": "rep0rter<rep0rter@googlegroups.com>",
   "license": "Apache-2.0",
@@ -19,10 +18,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^20.11.5",
     "commitizen": "^4.3.0",
-    "cz-conventional-changelog": "^3.3.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "cz-conventional-changelog": "^3.3.0"
   }
 }
