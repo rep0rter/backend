@@ -28,7 +28,7 @@ enum CurrentType {
   metadata,
 }
 
-function parseArticles(markdownData: string): Article {
+function parseArticle(markdownData: string): Article {
   let markdownParsedData = markdown.parse(markdownData, {});
   let parsedArticle: Article = {
     title: "",
@@ -143,4 +143,4 @@ function parseArticles(markdownData: string): Article {
   return parsedArticle;
 }
 
-export default parseArticles;
+export default parseArticle;
