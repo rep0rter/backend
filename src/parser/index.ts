@@ -28,19 +28,9 @@ enum CurrentType {
   metadata,
 }
 
-function parseArticles(markdownData: string): Article[] {
-  let markdownParsedData = markdown.parse(markdownData, {}),
-    parsedArticles: Article[] = [];
-
-  // Parsing stats
-  let articleOpened = false,
-    titleOpened = false,
-    descOpened = false,
-    metadataListOpened = false,
-    metadataOpened = false;
-
-  // Temp data
-  let currentArticle: Article = {
+function parseArticles(markdownData: string): Article {
+  let markdownParsedData = markdown.parse(markdownData, {});
+  let parsedArticle: Article = {
     title: "",
     shortDesc: "",
     avatar: "",
@@ -50,14 +40,20 @@ function parseArticles(markdownData: string): Article[] {
     reference: "",
   };
 
+  // Parsing stats
+  let titleOpened = false,
+    descOpened = false,
+    metadataListOpened = false,
+    metadataOpened = false;
+
   for (let token of markdownParsedData) {
     switch (token.type) {
       case "inline":
         if (titleOpened) {
-          currentArticle.title = token.content.trim();
+          parsedArticle.title = token.content.trim();
           break;
         } else if (descOpened) {
-          currentArticle.shortDesc = token.content.trim();
+          parsedArticle.shortDesc = token.content.trim();
           break;
         } else if (metadataOpened) {
           let metadata = token.content.split(":");
@@ -67,27 +63,19 @@ function parseArticles(markdownData: string): Article[] {
             case "avatar":
               metadata.shift();
               let avatarParsed = markdown.parse(metadata.join(":"), {});
-              let imageAttrs = avatarParsed.filter(
-                (i) => i.type === "inline"
-              )[0]?.children?.[0]?.attrs;
+              let avatarUrl = avatarParsed
+                .filter((i) => i.type === "inline")[0]
+                ?.children?.[0]?.attrs?.filter((i) => i[0] === "src")[0][1];
+              let avatarAlt = avatarParsed.filter((i) => i.type === "inline")[0]
+                ?.children?.[0].content;
 
-              if (!imageAttrs)
-                throw new Error("Parsed image but attrs is empty");
-
-              for (let attr of imageAttrs) {
-                switch (attr[0]) {
-                  case "src":
-                    currentArticle.avatar = attr[1];
-                    break;
-                  case "alt":
-                    currentArticle.avatarAlt = attr[1];
-                    break;
-                }
-              }
+              if (!avatarUrl) throw new Error("No avatar defined");
+              parsedArticle.avatar = avatarUrl;
+              parsedArticle.avatarAlt = avatarAlt;
               break;
             case "name":
               metadata.shift();
-              currentArticle.author = metadata.join(":").trim();
+              parsedArticle.author = metadata.join(":").trim();
               break;
             case "time":
               metadata.shift();
@@ -95,25 +83,25 @@ function parseArticles(markdownData: string): Article[] {
 
               switch (date) {
                 case "Monday":
-                  currentArticle.time = Weekdays.Monday;
+                  parsedArticle.time = Weekdays.Monday;
                   break;
                 case "Tuesday":
-                  currentArticle.time = Weekdays.Tuesday;
+                  parsedArticle.time = Weekdays.Tuesday;
                   break;
                 case "Wednesday":
-                  currentArticle.time = Weekdays.Wednesday;
+                  parsedArticle.time = Weekdays.Wednesday;
                   break;
                 case "Thursday":
-                  currentArticle.time = Weekdays.Thursday;
+                  parsedArticle.time = Weekdays.Thursday;
                   break;
                 case "Friday":
-                  currentArticle.time = Weekdays.Friday;
+                  parsedArticle.time = Weekdays.Friday;
                   break;
                 case "Saturday":
-                  currentArticle.time = Weekdays.Saturday;
+                  parsedArticle.time = Weekdays.Saturday;
                   break;
                 case "Sunday":
-                  currentArticle.time = Weekdays.Sunday;
+                  parsedArticle.time = Weekdays.Sunday;
                   break;
                 default:
                   throw new Error(`Unexpected date ${date}`);
@@ -121,15 +109,11 @@ function parseArticles(markdownData: string): Article[] {
               break;
             case "reference":
               metadata.shift();
-              currentArticle.reference = metadata.join(":").trim();
+              parsedArticle.reference = metadata.join(":").trim();
           }
         }
         break;
       case "heading_open":
-        if (articleOpened) {
-          // Current article finished parsing
-          parsedArticles.push(currentArticle);
-        }
         titleOpened = true;
         break;
       case "heading_close":
@@ -155,9 +139,8 @@ function parseArticles(markdownData: string): Article[] {
         break;
     }
   }
-  parsedArticles.push(currentArticle);
 
-  return parsedArticles;
+  return parsedArticle;
 }
 
 export default parseArticles;
